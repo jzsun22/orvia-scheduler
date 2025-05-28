@@ -1,12 +1,18 @@
 // console.log('[get-eligible-workers] FILE EXECUTION START - Top of index.ts');
 
-import { supabaseAdmin } from '../_shared/supabaseClient.ts'; // Use the shared admin client
+import { supabaseAdmin } from '../_shared/supabaseClient.ts'; 
 import type { SupabaseClient } from '@supabase/supabase-js'; // Still need the type if used explicitly
 
 const PREP_BARISTA_POSITION_ID = process.env.PREP_BARISTA_POSITION_ID;
 
-import { getShiftContext, isWorkerEligibleForAssignment, ShiftContext, PrefetchedWorkerEligibilityData, ScheduledShiftData, ShiftTemplateData } from '../_shared/utils.ts'; // Added PrefetchedWorkerEligibilityData, ScheduledShiftData, ShiftTemplateData
-// Import from the new edge-specific helpers file
+import { 
+  getShiftContext, 
+  isWorkerEligibleForAssignment, 
+  ShiftContext, 
+  PrefetchedWorkerEligibilityData, 
+  ScheduledShiftData, 
+  ShiftTemplateData } from '../_shared/utils.ts'; 
+
 import { 
   fetchWorkersByLocation,
   fetchLocationHoursForDay,
@@ -45,8 +51,8 @@ interface EligibleWorkerResponse {
 // In a true Deno environment, Deno is a global.
 declare const Deno: any;
 
-// export default async function handler(req: Request): Promise<Response> {
-Deno.serve(async (req: Request) => { // Changed to Deno.serve for standard Edge Function
+
+Deno.serve(async (req: Request) => { s
   console.log("[get-eligible-workers] Function start.");
   console.log("get-eligible-workers: Attempting to read SUPABASE_URL:", Deno.env.get('SUPABASE_URL') ? "Found" : "NOT FOUND OR EMPTY");
   console.log("get-eligible-workers: Attempting to read SUPABASE_SERVICE_ROLE_KEY:", Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ? "Found (length: " + (Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')?.length || 0) + ")" : "NOT FOUND OR EMPTY");

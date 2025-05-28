@@ -9,9 +9,8 @@ import {
   updateScheduledShiftPrimaryWorker,
   ShiftContext,
   AssignmentData,
-  getDayOfWeekName, // Added import
+  getDayOfWeekName, 
   PrefetchedWorkerEligibilityData,
-  // Added for paired shifts
   getPairedShiftPartnerDetails,
   CUPERTINO_LOCATION_ID,
   PREP_BARISTA_POSITION_ID,
@@ -19,7 +18,7 @@ import {
   PAIRED_TEMPLATE_ID_2
 } from '../_shared/utils.ts';
 
-// Updated imports to use edge-supabase-helpers
+
 import { 
   fetchMultipleWorkerDetailsForEligibility,
   checkWorkerLocationLink,

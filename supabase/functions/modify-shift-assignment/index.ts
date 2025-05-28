@@ -1,4 +1,3 @@
-// IMPORTANT: Ensure Supabase URL and service role key are available as environment variables.
 import { supabaseAdmin } from '../_shared/supabaseClient.ts';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
@@ -11,7 +10,6 @@ import {
     AssignmentData,
     getDayOfWeekName,
     PrefetchedWorkerEligibilityData,
-    // Added for paired shifts
     getPairedShiftPartnerDetails,
     CUPERTINO_LOCATION_ID,
     PREP_BARISTA_POSITION_ID,

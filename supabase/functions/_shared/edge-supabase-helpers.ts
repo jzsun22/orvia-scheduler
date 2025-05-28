@@ -13,15 +13,14 @@ import type {
     RawAssignmentWithWorkerDetails,
     ShiftAssignment,
     ShiftAssignmentsWithWorker,
-    AvailabilityUpdate, // Assuming AvailabilityLabel is what was meant for AvailabilityUpdate
+    AvailabilityUpdate, 
     WorkerAvailability,
     WorkerEligibilityDetails,
     DayLocationOperatingHours,
     ConflictingScheduledShift,
-    DayOfWeek // Added DayOfWeek as it's used by fetchLocationHoursForDay
+    DayOfWeek 
 } from '../../../src/lib/types'; // Adjusted path for types
 
-// Copied from src/lib/supabase.ts and ensured client is the first parameter
 
 export const fetchShiftDetailsForContext = async (
   client: SupabaseClient,

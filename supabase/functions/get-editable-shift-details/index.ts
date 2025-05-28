@@ -1,12 +1,9 @@
-// IMPORTANT: Ensure Supabase URL and service role key are available as environment variables.
-
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'; // type Request removed as it's not directly used in this snippet
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'; 
 import { corsHeaders } from '../_shared/cors.ts'
-// import { createSupabaseClient } from '../_shared/supabaseClient.ts' // Remove user-specific client
-import { supabaseAdmin } from '../_shared/supabaseClient.ts' // Import admin client
-import type { SupabaseClient } from '@supabase/supabase-js'; // Added type import for SupabaseClient
+import { supabaseAdmin } from '../_shared/supabaseClient.ts' 
+import type { SupabaseClient } from '@supabase/supabase-js'; 
 
-// Corrected imports to use edge-supabase-helpers and proper types path
+
 import {
   getScheduledShiftById,
   getShiftTemplateById,
@@ -23,14 +20,6 @@ import type {
   EditableShiftDetails
 } from '../../../src/lib/types.ts'; // UPDATED PATH
 
-// interface GetEditableShiftDetailsRequestBody { // This was part of the removed handler
-//   scheduledShiftId: string;
-// }
-
-// // In a true Deno environment, Deno is a global. // This was part of the removed handler
-// declare const Deno: any;
-
-// The export default async function handler(...) block has been removed.
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -38,8 +27,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    // const supabaseClient = createSupabaseClient(req) // OLD: This uses the client from _shared/supabaseClient.ts that expects Auth header
-    const supabaseClient = supabaseAdmin; // NEW: Use the admin client, which doesn't rely on req.headers.Authorization
+    const supabaseClient = supabaseAdmin; 
     const { scheduledShiftId } = await req.json()
 
     if (!scheduledShiftId || typeof scheduledShiftId !== 'string') {

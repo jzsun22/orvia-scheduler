@@ -6,15 +6,15 @@ import {
   checkWorkerPositionLink,
   fetchLocationHoursForDay,
   updatePrimaryWorkerOnScheduledShift
-} from './edge-supabase-helpers.ts'; // Corrected path to new edge helpers
+} from './edge-supabase-helpers.ts'; 
 import { 
-  WorkerAvailability as WorkerAvailabilityType, // Renamed to avoid conflict if a local var is named WorkerAvailability
+  WorkerAvailability as WorkerAvailabilityType, 
   AvailabilityLabel,
-  ConflictingScheduledShift, // Corrected import for conflicting shifts
-  DayOfWeek, // Import DayOfWeek if it's used for keys in WorkerAvailabilityType
-  WorkerEligibilityDetails // For the worker object in isWorkerEligibleForAssignment
+  ConflictingScheduledShift, 
+  DayOfWeek, 
+  WorkerEligibilityDetails 
 } from '../../../src/lib/types.ts'; // Corrected path
-import { type SupabaseClient } from '@supabase/supabase-js'; // Import SupabaseClient
+import { type SupabaseClient } from '@supabase/supabase-js'; 
 
 // Added for pre-fetched data types
 export interface PrefetchedWorkerEligibilityData {
@@ -24,7 +24,7 @@ export interface PrefetchedWorkerEligibilityData {
   conflictingShiftsMap: Map<string, ConflictingScheduledShift[]>; // Added for pre-fetched conflicting shifts
 }
 
-// Define a more specific type for the Supabase client if you have one
+
 // For example, if you use generated types:
 // import { Database } from '../database.types';
 // type SupabaseAdminClient = SupabaseClient<Database>;
