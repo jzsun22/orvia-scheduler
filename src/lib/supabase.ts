@@ -5,31 +5,9 @@ import type {
     WorkerLocation,
     Worker,
     ShiftTemplate,
-    ScheduledShift,
-    LocationPosition,
-    Position,
     RecurringShiftAssignment,
-    // Restored potentially missing original types
-    ShiftDetailsContext, 
-    RawAssignmentWithWorkerDetails,
-    // Ensuring these are present from previous steps
-    ShiftAssignment,
-    ShiftAssignmentsWithWorker,
-    // Addressing the linter suggestion
-    AvailabilityLabel as AvailabilityUpdate, // Assuming AvailabilityLabel is what was meant for AvailabilityUpdate
-    WorkerAvailability,
-    WorkerEligibilityDetails,
-    DayLocationOperatingHours,
-    ConflictingScheduledShift
+    ShiftAssignment
 } from './types'
-
-// These environment variables need to be set in your .env.local file
-// const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-// const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-
-// Create a single supabase client for interacting with your database
-// This client is primarily for Next.js frontend/backend. Edge functions should use passed clients or supabaseAdmin.
-// export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
 
 // Helper function to get the current user
 export const getCurrentUser = async (client: SupabaseClient) => {
