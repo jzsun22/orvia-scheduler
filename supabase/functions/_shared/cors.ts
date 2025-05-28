@@ -6,10 +6,16 @@ export const corsHeaders = {
 }
 
 export function newCorsResponse(body: string | null, init?: ResponseInit): Response {
-  const responseInit = init ?? { status: body ? 200 : 204 }; 
-  responseInit.headers = { ...corsHeaders, ...responseInit.headers };
-  if (body && !responseInit.headers['Content-Type']) {
-    responseInit.headers['Content-Type'] = 'application/json';
+  const responseInit = init ?? { status: body ? 200 : 204 };
+  // Ensure headers is an object and merge corsHeaders
+  const headers = new Headers(responseInit.headers); // Initialize Headers object
+  for (const [key, value] of Object.entries(corsHeaders)) {
+    headers.set(key, value);
   }
+
+  if (body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+  responseInit.headers = headers; // Assign the Headers object back
   return new Response(body, responseInit);
-} 
+}
