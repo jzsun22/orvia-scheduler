@@ -26,3 +26,6 @@ project-structure-no-hidden.md
 # Supabase CLI generated folders
 supabase/.branches/
 supabase/.temp/ 
+
+# Test pages
+src/app/tests
