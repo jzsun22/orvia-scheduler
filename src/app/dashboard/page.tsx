@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client';
 import { fetchAllLocations } from '@/lib/supabase';
 import { startOfWeek, format } from 'date-fns';
 import { Button } from "@/components/ui/button";
+import { capitalizeWords } from '@/lib/utils';
 
 interface LocationCardData {
   location_id: string;
@@ -117,7 +118,7 @@ export default function Dashboard() {
             {locations.map((locationData) => (
               <div key={locationData.location_id} className="bg-card rounded-lg shadow-md p-6 border border-border flex flex-col justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-[#1f1f1f] mb-4">{locationData.location_name}</h2>
+                  <h2 className="text-xl font-semibold text-[#1f1f1f] mb-4">{capitalizeWords(locationData.location_name)}</h2>
                 </div>
                 <div className="flex gap-3 mt-auto">
                   <Button
