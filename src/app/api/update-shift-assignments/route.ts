@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { type Database } from '@/lib/supabase/database.types';
 
 // Types for the payload received from the client (e.g., EditShiftModal)
 interface ClientAssignmentPayload {
@@ -42,14 +43,10 @@ interface SPModifyShiftAssignmentsBody {
 }
 
 // Type for assignments fetched from the DB for comparison
-interface DBAssignment {
-  id: string;
-  worker_id: string | null;
-  assignment_type: string;
-  assigned_start: string | null;
-  assigned_end: string | null;
-  // Add any other fields you might need for comparison if available
-}
+type DBAssignment = Pick<
+  Database['public']['Tables']['shift_assignments']['Row'],
+  'id' | 'worker_id' | 'assignment_type' | 'assigned_start' | 'assigned_end'
+>;
 
 export async function POST(request: Request) {
   const supabase = createSupabaseServerClient();
