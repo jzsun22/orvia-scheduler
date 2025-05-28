@@ -10,7 +10,13 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { EditableShiftDetails, ShiftAssignmentsWithWorker, Worker, ShiftTemplate, Location, Position } from '../../lib/types'
+import { 
+  EditableShiftDetails, 
+  ShiftAssignmentsWithWorker, 
+  Worker, 
+  ShiftTemplate, 
+  Location, 
+  Position } from '../../lib/types'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Loader2, XCircle } from 'lucide-react' 
 import { WorkerSelectorDropdown } from '@/components/select/WorkerSelectorDropdown' 
@@ -32,12 +38,6 @@ interface NewShiftClientContext {
   startTime: string;    // HH:MM
   endTime: string;      // HH:MM
 }
-
-// Helper function to capitalize the first letter of each word
-// function capitalizeWords(str: string | undefined | null): string {
-//  if (!str) return "";
-//  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-// }
 
 // Helper function to format time to 12-hour AM/PM
 // Uses timezone-aware utilities for consistency

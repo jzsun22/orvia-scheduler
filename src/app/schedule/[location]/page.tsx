@@ -69,20 +69,6 @@ interface Worker {
   job_level?: string | null;
 }
 
-interface ScheduledShift {
-  id: string;
-  shift_date: string;
-  template_id: string;
-  worker_id: string | null;
-  start_time: string;
-  end_time: string;
-  is_recurring_generated: boolean;
-  positionName?: string;
-  workerName?: string;
-  workerLevel?: string;
-  // location_id is not directly on scheduled_shifts table
-}
-
 interface ShiftTemplate {
   id: string;
   location_id: string;
@@ -101,27 +87,27 @@ interface Position {
 
 // New interface for data passed to ScheduleGrid
 interface ScheduledShiftForGrid {
-  id: string; // from scheduled_shifts
-  shift_date: string; // from scheduled_shifts
-  template_id: string; // from scheduled_shifts
-  start_time: string; // from scheduled_shifts (original)
-  end_time: string; // from scheduled_shifts (original)
-  is_recurring_generated: boolean; // from scheduled_shifts
+  id: string; 
+  shift_date: string; 
+  template_id: string; 
+  start_time: string; 
+  end_time: string; 
+  is_recurring_generated: boolean; 
   positionName?: string; // Derived
   
   // Primary assignment details
-  worker_id: string | null; // Assigned worker's ID
+  worker_id: string | null; 
   workerName?: string; // Assigned worker's formatted name (e.g., "John Doe" or "John (Johnny) Doe")
-  job_level?: string | null; // Assigned worker's job level (e.g., "L1")
-  assigned_start?: string | null; // CHANGED
-  assigned_end?: string | null;   // CHANGED
+  job_level?: string | null;
+  assigned_start?: string | null; 
+  assigned_end?: string | null;  
   is_manual_override?: boolean | null; // From shift_assignments
 
   // Training assignment details
   trainingWorkerId?: string | null;
   trainingWorkerName?: string; // Trainee's Preferred or First name
-  trainingWorkerAssignedStart?: string | null; // CHANGED
-  trainingWorkerAssignedEnd?: string | null;   // CHANGED
+  trainingWorkerAssignedStart?: string | null; 
+  trainingWorkerAssignedEnd?: string | null;   
   isTrainingAssignmentManuallyOverridden?: boolean | null;
 }
 
