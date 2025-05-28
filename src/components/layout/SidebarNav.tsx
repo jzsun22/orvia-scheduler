@@ -45,6 +45,11 @@ export function SidebarNav() {
   const [isLoadingUser, setIsLoadingUser] = useState(true)
 
   useEffect(() => {
+    // Set schedule open state based on initial path
+    if (pathname.startsWith("/schedule")) {
+      setIsScheduleOpen(true);
+    }
+
     const fetchLocations = async () => {
       setIsLoadingLocations(true)
       const { data, error } = await supabase
@@ -100,7 +105,7 @@ export function SidebarNav() {
 
     fetchLocations()
     fetchUserData()
-  }, [])
+  }, [pathname]) // Add pathname to the dependency array
 
   return (
     <div className="flex h-screen w-72 flex-col border-r border-neutral-200 bg-white p-6">
