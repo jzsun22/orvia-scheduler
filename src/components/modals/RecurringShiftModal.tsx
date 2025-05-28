@@ -21,7 +21,7 @@ interface RecurringShift {
   position_name: string;
   start_time: string;
   end_time: string;
-  assignment_type: 'lead' | 'regular';
+  assignment_type: 'lead' | 'regular' | 'training';
 }
 
 interface RecurringShiftModalProps {
@@ -81,7 +81,7 @@ export function RecurringShiftModal({
   const [positionId, setPositionId] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
-  const [assignmentType, setAssignmentType] = useState<'lead' | 'regular'>('regular');
+  const [assignmentType, setAssignmentType] = useState<'lead' | 'regular' | 'training'>('regular');
 
   // Reset all form state when modal closes
   useEffect(() => {
@@ -156,7 +156,7 @@ export function RecurringShiftModal({
           setDayOfWeek(capitalizeDay(shiftData.day_of_week));
           setLocationId(matchingLocation?.id || ''); // Set ID, fallback to empty
           setPositionId(shiftData.position_id);
-          setAssignmentType(shiftData.assignment_type);
+          setAssignmentType(shiftData.assignment_type as 'lead' | 'regular' | 'training');
           setStartTime(shiftData.start_time || ''); // Set initial times
           setEndTime(shiftData.end_time || '');
         }
@@ -419,7 +419,7 @@ export function RecurringShiftModal({
         position_name: selectedPosition?.name || 'Unknown Position',
         start_time: savedShiftResponse.start_time,
         end_time: savedShiftResponse.end_time,
-        assignment_type: savedShiftResponse.assignment_type,
+        assignment_type: savedShiftResponse.assignment_type as 'lead' | 'regular' | 'training',
       };
       
       onSuccess({ savedShift: fullSavedShift, isNew: !isEditing });
@@ -557,7 +557,7 @@ export function RecurringShiftModal({
               <Label>Assignment Type</Label>
               <RadioGroup
                 value={assignmentType}
-                onValueChange={(value: 'lead' | 'regular') => setAssignmentType(value)}
+                onValueChange={(value: 'lead' | 'regular' | 'training') => setAssignmentType(value)}
                 className="flex gap-4"
               >
                 <div className="flex items-center space-x-2">
@@ -567,6 +567,10 @@ export function RecurringShiftModal({
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="lead" id="lead" />
                   <Label htmlFor="lead">Lead</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="training" id="training" />
+                  <Label htmlFor="training">Training</Label>
                 </div>
               </RadioGroup>
             </div>

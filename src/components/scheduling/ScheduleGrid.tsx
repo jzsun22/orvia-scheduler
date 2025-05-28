@@ -6,8 +6,8 @@ const PT_TIMEZONE = 'America/Los_Angeles';
 
 interface Worker {
   id: string;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   preferred_name?: string | null;
   job_level?: string | null;
 }
@@ -15,10 +15,10 @@ interface Worker {
 interface ScheduledShiftForGridDisplay {
   id: string;
   shift_date: string;
-  template_id: string;
-  start_time: string;
-  end_time: string;
-  is_recurring_generated: boolean;
+  template_id: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  is_recurring_generated: boolean | null;
   positionName?: string;
   
   worker_id: string | null;
@@ -38,12 +38,12 @@ interface ScheduledShiftForGridDisplay {
 
 interface ShiftTemplate {
   id: string;
-  location_id: string;
-  position_id: string;
-  days_of_week: string[];
+  location_id: string | null;
+  position_id: string | null;
+  days_of_week: string[] | null;
   start_time: string;
   end_time: string;
-  lead_type?: string;
+  lead_type?: string | null;
   schedule_column_group?: number | null;
 }
 
@@ -184,7 +184,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ weekStart, scheduledShifts,
     const templatesByPrimaryRole = new Map<string, ShiftTemplate[]>();
     shiftTemplates.forEach(template => {
       const position = positions.find(p => p.id === template.position_id);
-      if (!position) return; 
+      if (!position || !template.position_id) return;
 
       let primaryRoleName = position.name.split(' - ')[0];
       if (position.name === "Prep + Barista") {
@@ -203,7 +203,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ weekStart, scheduledShifts,
 
       roleTemplates.forEach(template => {
         const position = positions.find(p => p.id === template.position_id);
-        if (!position) return;
+        if (!position || !template.position_id) return;
 
         let groupKey: string;
         if (template.schedule_column_group !== null && template.schedule_column_group !== undefined) {
@@ -216,20 +216,15 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ weekStart, scheduledShifts,
           const groupLeadType = template.lead_type;
           let headerText = `${position.name}${groupLeadType ? ` - ${capitalize(groupLeadType)}` : ''}`;
           
-          // Custom logic for Prep/Barista combined roles to split header text if needed
-          // This part might need review if "Prep + Barista" is a single position name that should map to "Barista" role but display different headers for columns.
-          // The current primaryRoleName grouping already puts "Prep + Barista" position templates under "Barista" role.
-          // If "Prep" and "Barista" are truly distinct columns within the "Barista" role group:
           if (primaryRoleName === "Barista" && position.name === "Prep + Barista") {
              if (template.start_time === "09:30:00" || template.start_time === "09:30") {
-               headerText = "Prep"; // Header for the Prep column within Barista group
+               headerText = "Prep";
              } else if (template.start_time === "12:00:00" || template.start_time === "12:00") {
-               headerText = "Barista"; // Header for the Barista column within Barista group
+               headerText = "Barista";
              }
-             // If times don't match, it uses the full "Prep + Barista" name with lead type.
           }
 
-          const headerTimeText = `${formatTime12hr(template.start_time)} - ${formatTime12hr(template.end_time)}`;
+          const headerTimeText = `${formatTime12hr(template.start_time || '')} - ${formatTime12hr(template.end_time || '')}`;
           processedColumnsMap.set(groupKey, {
             id: groupKey,
             positionId: template.position_id,
@@ -349,7 +344,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ weekStart, scheduledShifts,
 
                 if (!editMode && shiftsForThisDayAndRole.length === 0) {
                   const templatesForThisDayAndRole = columnsForRole.some(col =>
-                    col.memberTemplates.some(mt => mt.days_of_week.includes(DAYS_OF_WEEK[dayIndex].toLowerCase()))
+                    col.memberTemplates.some(mt => mt.days_of_week && mt.days_of_week.includes(DAYS_OF_WEEK[dayIndex].toLowerCase()))
                   );
                   if (!templatesForThisDayAndRole) return null;
                 }
@@ -373,7 +368,7 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ weekStart, scheduledShifts,
                     </td>
                     {columnsForRole.map((column) => {
                       const templatesForCell = column.memberTemplates.filter(template =>
-                        template.days_of_week.includes(DAYS_OF_WEEK[dayIndex].toLowerCase())
+                        template.days_of_week && template.days_of_week.includes(DAYS_OF_WEEK[dayIndex].toLowerCase())
                       );
                       const shiftsInCell = scheduledShifts.filter(s => 
                         s.shift_date === dateString && templatesForCell.some(t => t.id === s.template_id)
@@ -396,16 +391,20 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ weekStart, scheduledShifts,
                                 onShiftClick({ type: 'existing', shiftId: shiftsInCell[0].id });
                               } else if (templatesForCell.length > 0) {
                                 const primaryTemplateForCell = templatesForCell[0];
-                                onShiftClick({ 
-                                  type: 'new', 
-                                  templateId: primaryTemplateForCell.id, 
-                                  dateString: dateString,
-                                  startTime: primaryTemplateForCell.start_time,
-                                  endTime: primaryTemplateForCell.end_time,
-                                  locationId: locationId,
-                                  positionId: primaryTemplateForCell.position_id,
-                                  leadType: primaryTemplateForCell.lead_type 
-                                });
+                                if (primaryTemplateForCell.position_id) {
+                                  onShiftClick({ 
+                                    type: 'new', 
+                                    templateId: primaryTemplateForCell.id, 
+                                    dateString: dateString,
+                                    startTime: primaryTemplateForCell.start_time,
+                                    endTime: primaryTemplateForCell.end_time,
+                                    locationId: locationId,
+                                    positionId: primaryTemplateForCell.position_id,
+                                    leadType: primaryTemplateForCell.lead_type 
+                                  });
+                                } else {
+                                  console.warn("Cannot create new shift: template is missing position_id", primaryTemplateForCell);
+                                }
                               }
                             }
                           }}
@@ -417,15 +416,15 @@ const ScheduleGrid: React.FC<ScheduleGridProps> = ({ weekStart, scheduledShifts,
                                 return (
                                   <div key={shift.id} className="mb-1 last:mb-0"> 
                                     <div className="font-semibold text-green-800">
-                                      {formatWorkerDisplay(shift.workerName, shift.job_level, shift.start_time, shift.end_time, shift.assigned_start, shift.assigned_end)}
+                                      {formatWorkerDisplay(shift.workerName, shift.job_level, shift.start_time || '', shift.end_time || '', shift.assigned_start, shift.assigned_end)}
                                     </div>
                                     {shift.trainingWorkerName && (
                                       <div className="mt-0.5 pt-0.5 border-t border-gray-200 text-xs text-blue-700">
                                         <span>trn: {shift.trainingWorkerName}</span>
                                         {(shift.trainingWorkerAssignedStart && shift.trainingWorkerAssignedEnd && 
-                                          (shift.trainingWorkerAssignedStart !== shift.start_time || shift.trainingWorkerAssignedEnd !== shift.end_time)) && (
+                                          (shift.trainingWorkerAssignedStart !== (shift.start_time || '') || shift.trainingWorkerAssignedEnd !== (shift.end_time || ''))) && (
                                           <span className="text-gray-500 text-xs block">
-                                            ({formatTime12hr(shift.trainingWorkerAssignedStart)} - {formatTime12hr(shift.trainingWorkerAssignedEnd)})
+                                            ({formatTime12hr(shift.trainingWorkerAssignedStart || '')} - {formatTime12hr(shift.trainingWorkerAssignedEnd || '')})
                                           </span>
                                         )}
                                       </div>

@@ -32,7 +32,7 @@ interface RecurringShift {
   position_name: string;
   start_time: string;
   end_time: string;
-  assignment_type: 'lead' | 'regular';
+  assignment_type: 'lead' | 'regular' | 'training';
 }
 
 interface LocationHour {
@@ -242,10 +242,11 @@ export function AvailabilityModal({ isOpen, onClose, onSuccess, employee }: Avai
         const locationObject = Array.isArray(shift.location) ? shift.location[0] : shift.location;
         const locationName = locationObject?.name || 'Unknown Location';
 
-        // Map DB assignment_type to the interface type 
-        const assignmentType = (shift.assignment_type === 'lead' || shift.assignment_type === 'regular') 
-                               ? shift.assignment_type 
-                               : 'regular'; // Default handling if DB has newer types
+        // Map DB assignment_type to the interface type
+        let mappedAssignmentType: 'lead' | 'regular' | 'training' = 'regular'; // Default to 'regular'
+        if (shift.assignment_type === 'lead' || shift.assignment_type === 'regular' || shift.assignment_type === 'training') {
+          mappedAssignmentType = shift.assignment_type;
+        }
 
         return {
           id: shift.id,
@@ -256,7 +257,7 @@ export function AvailabilityModal({ isOpen, onClose, onSuccess, employee }: Avai
           position_name: positionName,
           start_time: shift.start_time,
           end_time: shift.end_time,
-          assignment_type: assignmentType
+          assignment_type: mappedAssignmentType, // Use the mapped type
         };
       }) || [];
 

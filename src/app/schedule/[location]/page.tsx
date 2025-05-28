@@ -63,20 +63,20 @@ interface Location {
 
 interface Worker {
   id: string;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   preferred_name?: string | null;
   job_level?: string | null;
 }
 
 interface ShiftTemplate {
   id: string;
-  location_id: string;
-  position_id: string;
-  days_of_week: string[];
+  location_id: string | null;
+  position_id: string | null;
+  days_of_week: string[] | null;
   start_time: string;
   end_time: string;
-  lead_type?: string;
+  lead_type?: string | null;
   schedule_column_group?: number | null;
 }
 
@@ -89,15 +89,15 @@ interface Position {
 interface ScheduledShiftForGrid {
   id: string; 
   shift_date: string; 
-  template_id: string; 
-  start_time: string; 
-  end_time: string; 
-  is_recurring_generated: boolean; 
+  template_id: string | null; 
+  start_time: string | null; 
+  end_time: string | null; 
+  is_recurring_generated: boolean | null; 
   positionName?: string; // Derived
   
   // Primary assignment details
   worker_id: string | null; 
-  workerName?: string; // Assigned worker's formatted name (e.g., "John Doe" or "John (Johnny) Doe")
+  workerName?: string; // Assigned worker's formatted name
   job_level?: string | null;
   assigned_start?: string | null; 
   assigned_end?: string | null;  
@@ -285,7 +285,9 @@ const SchedulePage = () => {
       if (!allShiftsForDateRange || allShiftsForDateRange.length === 0) { setScheduledShifts([]); return; }
       
       const templateIdsForCurrentLocation = allShiftTemplates.filter(t => t.location_id === location.id).map(t => t.id);
-      const relevantScheduledShifts = allShiftsForDateRange.filter(s => templateIdsForCurrentLocation.includes(s.template_id));
+      const relevantScheduledShifts = allShiftsForDateRange.filter(s => 
+        s.template_id !== null && templateIdsForCurrentLocation.includes(s.template_id)
+      );
       if (relevantScheduledShifts.length === 0) { setScheduledShifts([]); return; }
 
       const shiftIds = relevantScheduledShifts.map(s => s.id);

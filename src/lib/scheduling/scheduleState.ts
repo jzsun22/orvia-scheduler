@@ -180,13 +180,15 @@ export class ScheduleGenerationState {
     public getUnfilledTemplateInstances(weekDates: Date[]): { template: ShiftTemplate, date: string, dayOfWeek: DayOfWeek }[] {
         const results: { template: ShiftTemplate, date: string, dayOfWeek: DayOfWeek }[] = [];
         for (const template of this.initialTemplates) {
-            for (const dayOfWeek of template.days_of_week) {
-                // Find the date for this dayOfWeek in weekDates
-                const dateObj = weekDates.find(d => getDayOfWeekStringFromDate(d) === dayOfWeek);
-                if (!dateObj) continue;
-                const dateStr = formatDateToYYYYMMDD(dateObj);
-                if (!this.isTemplateSlotFilled(template.id, dateStr)) {
-                    results.push({ template, date: dateStr, dayOfWeek });
+            if (template.days_of_week && template.days_of_week.length > 0) {
+                for (const dayOfWeek of template.days_of_week) {
+                    // Find the date for this dayOfWeek in weekDates
+                    const dateObj = weekDates.find(d => getDayOfWeekStringFromDate(d) === dayOfWeek);
+                    if (!dateObj) continue;
+                    const dateStr = formatDateToYYYYMMDD(dateObj);
+                    if (!this.isTemplateSlotFilled(template.id, dateStr)) {
+                        results.push({ template, date: dateStr, dayOfWeek });
+                    }
                 }
             }
         }
