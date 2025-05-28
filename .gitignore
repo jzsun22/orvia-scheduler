@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+
+# Next.js
+.next/
+
+# Build artifacts & Caches
+.swc/
+tsconfig.tsbuildinfo
+
+# Environment variables
+.env.local
+# Add other .env.*.local files if you create them, e.g.:
+# .env.development.local
+# .env.test.local
+# .env.production.local
+
+# IDEs / Editors - User specific
+.vscode/
+.cursor/
+
+# User specific documents
+Proposed Modules & Implementation Plan.txt 
+project-structure-no-hidden.md
+
+# Supabase CLI generated folders
+supabase/.branches/
+supabase/.temp/ 
