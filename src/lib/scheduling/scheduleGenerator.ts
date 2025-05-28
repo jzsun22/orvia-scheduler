@@ -1,4 +1,4 @@
-import type { SupabaseClient } from '@supabase/supabase-js'; // Correct import for SupabaseClient type
+import type { SupabaseClient } from '@supabase/supabase-js'; 
 import { 
     ShiftTemplate, 
     Worker, 
@@ -7,7 +7,6 @@ import {
     DayOfWeek,
     ScheduledShift,
     ShiftAssignment
-    // SupabaseClient type is now imported from '@supabase/supabase-js'
 } from '@/lib/types';
 import { ScheduleGenerationState } from './scheduleState';
 import { processRecurringAssignments } from './recurringAssigner';
@@ -15,8 +14,8 @@ import { processPairedPrepBaristaShifts } from './pairedShiftAssigner';
 import { assignLeads } from './leadAssigner';
 import { assignDynamicShifts } from './dynamicAssigner';
 import { saveSchedule } from './dataSaver';
-import { getWeekDateRange } from './utils'; // Assuming this utility exists
-import { fetchSchedulingPrerequisites } from '@/lib/supabase'; // Assuming fetch function is here
+import { getWeekDateRange } from './utils'; 
+import { fetchSchedulingPrerequisites } from '@/lib/supabase'; 
 
 /**
  * Orchestrates the weekly schedule generation process for a specific location.
@@ -47,6 +46,7 @@ export async function generateWeeklySchedule(
     const warnings: string[] = [];
     let success = false;
     let finalUnassignedTemplates: ShiftTemplate[] = [];
+    let finalUnassignedInstancesCount = 0;
 
     try {
         // --- 1. Initialization & Data Fetching ---
@@ -166,6 +166,8 @@ export async function generateWeeklySchedule(
         // --- 6. Extract Final State & Unassigned ---
         const finalShifts = state.scheduledShifts;
         const finalAssignments = state.shiftAssignments;
+        const finalUnassignedInstances = state.getUnfilledTemplateInstances(weekDates);
+        finalUnassignedInstancesCount = finalUnassignedInstances.length;
         finalUnassignedTemplates = templates.filter(t => !state.isTemplateSlotFilled(t.id));
 
         if (finalShifts.length === 0) {
@@ -195,7 +197,7 @@ export async function generateWeeklySchedule(
     }
 
     // --- 8. Return Results ---
-    console.log(`Generation finished. Success: ${success}, Warnings: ${warnings.length}, Unassigned: ${finalUnassignedTemplates.length}`);
+    console.log(`Generation finished. Success: ${success}, Warnings: ${warnings.length}, Unassigned Instances: ${finalUnassignedInstancesCount}`);
     return {
         success,
         warnings,

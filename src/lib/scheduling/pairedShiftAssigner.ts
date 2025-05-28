@@ -12,7 +12,6 @@ import {
 import { ScheduleGenerationState } from './scheduleState';
 import { 
     mapDayOfWeekToDate, 
-    getDayOfWeekStringFromDate,
     isShiftWithinAvailability
 } from './utils';
 import { calculateShiftDurationHours } from './time-utils';

@@ -3,9 +3,11 @@ import {
     ScheduledShift,
     ShiftAssignment,
     Worker,
-    DayOfWeek // Import DayOfWeek if needed by formatDateKey, seems it is
+    DayOfWeek 
 } from '@/lib/types';
-import { formatDateToYYYYMMDD, getDayOfWeekStringFromDate } from './utils'; // Import the shared helper
+import { 
+    formatDateToYYYYMMDD, 
+    getDayOfWeekStringFromDate } from './utils'; 
 
 /**
  * Manages the state of the schedule generation process in memory.

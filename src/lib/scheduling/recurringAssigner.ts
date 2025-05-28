@@ -2,13 +2,12 @@ import {
     RecurringShiftAssignment, 
     ShiftTemplate, 
     ScheduledShift, 
-    ShiftAssignment, 
-    DayOfWeek 
+    ShiftAssignment
 } from '@/lib/types';
 import { ScheduleGenerationState } from './scheduleState';
 import { mapDayOfWeekToDate } from './utils';
 import { calculateShiftDurationHours } from './time-utils';
-import { v4 as uuidv4 } from 'uuid'; // Assuming UUID library is installed
+import { v4 as uuidv4 } from 'uuid'; 
 
 /**
  * Processes predefined recurring assignments for a given week.

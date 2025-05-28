@@ -1,4 +1,11 @@
-import { DayOfWeek, TimeRange, WorkerAvailability, LocationOperatingHours, AvailabilityLabel, Worker, ShiftTemplate, Position, Location } from '@/lib/types';
+import { 
+    DayOfWeek, 
+    TimeRange, 
+    WorkerAvailability, 
+    LocationOperatingHours, 
+    Worker, 
+    ShiftTemplate
+} from '@/lib/types';
 import { parseTime, calculateShiftDurationHours } from './time-utils';
 import { ScheduleGenerationState } from './scheduleState';
 

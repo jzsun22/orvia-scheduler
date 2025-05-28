@@ -5,14 +5,13 @@ import {
     ShiftAssignment,
     LocationOperatingHours,
     DayOfWeek,
-    compareJobLevels, // Import the comparator
+    compareJobLevels
 } from '@/lib/types';
 import { ScheduleGenerationState } from './scheduleState';
 import { 
-    mapDayOfWeekToDate, 
-    checkWorkerShiftEligibility, // Import shared helper
-    formatDateToYYYYMMDD, // Import for date formatting
-    getDayOfWeekStringFromDate // Import for day of week string
+    checkWorkerShiftEligibility, 
+    formatDateToYYYYMMDD, 
+    getDayOfWeekStringFromDate 
 } from './utils';
 import { calculateShiftDurationHours } from './time-utils';
 import { v4 as uuidv4 } from 'uuid';
