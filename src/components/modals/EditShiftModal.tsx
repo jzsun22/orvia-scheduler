@@ -14,12 +14,13 @@ import { EditableShiftDetails, ShiftAssignmentsWithWorker, Worker, ShiftTemplate
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Loader2, XCircle } from 'lucide-react' 
 import { WorkerSelectorDropdown } from '@/components/select/WorkerSelectorDropdown' 
-import type { ShiftClickContext } from '@/components/features/schedule/ScheduleGrid' // Import context type
-import { supabase } from '@/lib/supabase/client' // Import Supabase client
+import type { ShiftClickContext } from '@/components/scheduling/ScheduleGrid' 
+import { supabase } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
-import { useAppToast } from "@/lib/toast-service"; // Added import
+import { useAppToast } from "@/lib/toast-service"; 
 import { APP_TIMEZONE, parseTime as parseAppTime } from '@/lib/scheduling/time-utils';
 import { formatInTimeZone } from 'date-fns-tz';
+import { capitalizeWords } from '@/lib/utils'; // Added import
 
 const PREP_BARISTA_POSITION_ID = process.env.PREP_BARISTA_POSITION_ID;
 
@@ -33,10 +34,10 @@ interface NewShiftClientContext {
 }
 
 // Helper function to capitalize the first letter of each word
-function capitalizeWords(str: string | undefined | null): string {
-  if (!str) return "";
-  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-}
+// function capitalizeWords(str: string | undefined | null): string {
+//  if (!str) return "";
+//  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+// }
 
 // Helper function to format time to 12-hour AM/PM
 // Uses timezone-aware utilities for consistency

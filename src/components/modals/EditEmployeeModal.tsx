@@ -23,6 +23,7 @@ import { fetchAllLocations } from '@/lib/supabase';
 import { Worker, Location, Position, JobLevel, LocationPosition as LocationPositionBase } from '@/lib/types';
 import { useAppToast } from "@/lib/toast-service";
 import { Switch } from '@/components/ui/switch';
+import { capitalizeWords } from '@/lib/utils';
 
 // Define a type for the shape returned by the Supabase query
 interface FetchedLocationPosition {
@@ -510,7 +511,7 @@ export function EditEmployeeModal({ isOpen, onClose, onSuccess, employee }: Edit
                             }}
                           />
                           <Label htmlFor={`location-${location.id}`} className="font-normal">
-                            {location.name}
+                            {capitalizeWords(location.name)}
                           </Label>
                         </div>
                       ))}

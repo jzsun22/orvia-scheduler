@@ -12,8 +12,9 @@ import { employeeSchema, type EmployeeFormData } from '@/lib/schemas/employee';
 import { supabase } from '@/lib/supabase/client';
 import { fetchAllLocations } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { Location, LocationPosition as LocationPositionBase, JobLevel, Position } from '@/lib/types';
+import { Location, JobLevel, Position } from '@/lib/types';
 import { useAppToast } from "@/lib/toast-service";
+import { capitalizeWords } from '@/lib/utils';
 
 // Define a type for the shape returned by the Supabase query
 interface FetchedLocationPosition {
@@ -348,7 +349,7 @@ export function AddEmployeeModal({ isOpen, onClose, onSuccess }: AddEmployeeModa
                       }}
                     />
                     <Label htmlFor={`location-${location.id}`} className="font-normal">
-                      {location.name}
+                      {capitalizeWords(location.name)}
                     </Label>
                   </div>
                 ))}
