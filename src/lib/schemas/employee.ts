@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { JobLevel } from '@/lib/types';
 
 export const employeeSchema = z.object({
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
-  preferred_name: z.string().optional(),
+  first_name: z.string().trim().min(1, 'First name is required'),
+  last_name: z.string().trim().min(1, 'Last name is required'),
+  preferred_name: z.string().trim().optional(),
   job_level: z.enum(['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'] as [JobLevel, ...JobLevel[]]),
   is_lead: z.boolean(),
   positions: z.array(z.string()).min(1, 'At least one position is required'),
