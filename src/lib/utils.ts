@@ -29,3 +29,13 @@ export function formatWorkerName(
 
   return `${preferredName} (${firstName}) ${lastName}`;
 } 
+
+/**
+ * Capitalizes the first letter of each word in a string
+ * @param str The string to capitalize
+ * @returns The string with each word capitalized
+ */
+export function capitalizeWords(str: string | undefined | null): string {
+  if (!str) return "";
+  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+} 
