@@ -13,7 +13,6 @@ import type {
     RawAssignmentWithWorkerDetails,
     ShiftAssignment,
     ShiftAssignmentsWithWorker,
-    AvailabilityUpdate, 
     WorkerAvailability,
     WorkerEligibilityDetails,
     DayLocationOperatingHours,
