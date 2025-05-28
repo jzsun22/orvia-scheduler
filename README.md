@@ -36,8 +36,8 @@
 
 ```
 Orvia
-├── supabase/                                 # Supabase function specific files
-│   ├── functions/                            # Serverless functions deployed to Supabase Edge
+├── supabase/                       # Supabase function specific files
+│   ├── functions/                  # Serverless functions deployed to Supabase Edge
 │   ├── migrations/                                                        
 │   └── import_map.json
 ├── src/                                                                   
@@ -47,25 +47,25 @@ Orvia
 │   │   ├── employees/                                                     
 │   │   ├── login/                                                         
 │   │   └── schedule/                                                     
-│   │       └── [location]/                   # Dynamic route, location-specifc                                                  
+│   │       └── [location]/         # Dynamic route, location-specifc                                                  
 │   ├── components/                                                        
 │   │   ├── layout/                                                        
-│   │   ├── modals/                           # Modal dialog components
-│   │   ├── scheduling/                       # Components specific to the scheduling features
-│   │   ├── select/                           # Custom select/dropdown components
+│   │   ├── modals/                 # Modal dialog components
+│   │   ├── scheduling/             # Components specific to the scheduling features
+│   │   ├── select/                 # Custom select/dropdown components
 │   │   └── ui/                                                            
-│   ├── hooks/                                # Custom React hooks for shared logic and state management
+│   ├── hooks/                      # Custom React hooks for shared logic and state management
 │   ├── lib/                                                               
-│   │   ├── db/                               # Database-related utilities and helper functions
-│   │   ├── scheduling/                       # Core logic for schedule generation and manipulation
-│   │   ├── schemas/                          # Data validation schemas 
-│   │   ├── supabase/                         # Supabase client    
-│   │   ├── supabase.ts                       # Supabase helper functions
+│   │   ├── db/                     # Database-related utilities and helper functions
+│   │   ├── scheduling/             # Core logic for schedule generation and manipulation
+│   │   ├── schemas/                # Data validation schemas 
+│   │   ├── supabase/               # Supabase client    
+│   │   ├── supabase.ts             # Supabase helper functions
 │   │   ├── types.ts
 │   │   └── utils.ts
 │   ├── styles/                                                            
 │   ├── types/                                                             
-└── public/                                   # Static assets
+└── public/                         # Static assets
 ``` 
 
 ---
