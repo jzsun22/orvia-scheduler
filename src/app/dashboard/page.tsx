@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { fetchAllLocations } from '@/lib/supabase';
-import { startOfWeek, endOfWeek, format, addWeeks } from 'date-fns';
+import { startOfWeek, format } from 'date-fns';
 import { Button } from "@/components/ui/button";
 
 interface LocationCardData {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { generateWeeklySchedule } from "@/lib/scheduling/scheduleGenerator";
@@ -15,7 +15,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAppToast } from "@/lib/toast-service";
-
 
 const PT_TIMEZONE = 'America/Los_Angeles';
 
