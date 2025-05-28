@@ -34,8 +34,7 @@
 
 ## 📦 Project Structure
 
-# Project Structure (No Hidden Files/Folders)
-
+```
 Orvia
 ├── supabase/                                                              # Supabase function specific files
 │   ├── functions/                                                         # Serverless functions deployed to Supabase Edge
