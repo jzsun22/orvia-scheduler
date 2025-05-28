@@ -1,19 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { type Database } from '@/lib/supabase/database.types';
 
 // Define constants for paired shifts
 const CUPERTINO_LOCATION_ID = process.env.CUPERTINO_LOCATION_ID;
 const PREP_BARISTA_POSITION_ID = process.env.PREP_BARISTA_POSITION_ID;
-const PAIRED_TEMPLATE_ID_1 = process.env.PAIRED_TEMPLATE_ID_1; // Example: AM part
-const PAIRED_TEMPLATE_ID_2 = process.env.PAIRED_TEMPLATE_ID_2; // Example: PM part
-
-interface ShiftTemplateDetails {
-  id: string;
-  start_time: string;
-  end_time: string;
-  position_id: string;
-  location_id: string;
-}
+const PAIRED_TEMPLATE_ID_1 = process.env.PAIRED_TEMPLATE_ID_1; 
+const PAIRED_TEMPLATE_ID_2 = process.env.PAIRED_TEMPLATE_ID_2; 
 
 interface ShiftData {
   shift_date: string;    // YYYY-MM-DD
@@ -52,12 +45,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields in shiftData (shift_date, template_id)' }, { status: 400 });
     }
 
+    // Define consistent types for shift template and scheduled shift rows/inserts
+    type ShiftTemplateRow = Database['public']['Tables']['shift_templates']['Row'];
+    type ScheduledShiftInsert = Database['public']['Tables']['scheduled_shifts']['Insert'];
+    type ScheduledShiftRow = Database['public']['Tables']['scheduled_shifts']['Row'];
+
     // 1. Fetch details for the primary template
     const { data: primaryTemplate, error: primaryTemplateError } = await supabase
       .from('shift_templates')
       .select('id, start_time, end_time, position_id, location_id')
       .eq('id', template_id)
-      .single<ShiftTemplateDetails>();
+      .single<ShiftTemplateRow>();
 
     if (primaryTemplateError || !primaryTemplate) {
       console.error('Supabase error fetching primary template:', primaryTemplateError);
@@ -66,7 +64,7 @@ export async function POST(request: Request) {
 
     let isPairedShift = false;
     let partnerTemplateId: string | null = null;
-    let partnerTemplate: ShiftTemplateDetails | null = null;
+    let partnerTemplate: ShiftTemplateRow | null = null; // Use the consistent Row type
     let scheduledShiftIdForAssignments: string;
     let createdPartnerScheduledShiftId: string | null = null;
 
@@ -82,11 +80,11 @@ export async function POST(request: Request) {
       }
 
       if (partnerTemplateId) {
-        const { data: fetchedPartnerTemplate, error: partnerTemplateError } = await supabase
+        const { data: fetchedPartnerTemplate, error: partnerTemplateError }  = await supabase
           .from('shift_templates')
           .select('id, start_time, end_time, position_id, location_id')
           .eq('id', partnerTemplateId)
-          .single<ShiftTemplateDetails>();
+          .single<ShiftTemplateRow>();
 
         if (partnerTemplateError || !fetchedPartnerTemplate) {
           console.warn(`Paired shift detected, but partner template ${partnerTemplateId} not found. Proceeding as non-paired.`, partnerTemplateError);
@@ -106,17 +104,18 @@ export async function POST(request: Request) {
     // 2. Create the scheduled shift(s)
     if (isPairedShift && partnerTemplate) {
       // Create first part of the pair (using primaryTemplate)
+      const shift1ToInsert: ScheduledShiftInsert = {
+        shift_date,
+        template_id: primaryTemplate.id,
+        start_time: primaryTemplate.start_time,
+        end_time: primaryTemplate.end_time,
+        is_recurring_generated: false,
+      };
       const { data: newScheduledShift1, error: shiftError1 } = await supabase
         .from('scheduled_shifts')
-        .insert({
-          shift_date,
-          template_id: primaryTemplate.id,
-          start_time: primaryTemplate.start_time,
-          end_time: primaryTemplate.end_time,
-          is_recurring_generated: false,
-        })
+        .insert(shift1ToInsert)
         .select('id')
-        .single();
+        .single<ScheduledShiftRow>();
 
       if (shiftError1 || !newScheduledShift1) {
         console.error('Supabase error creating first part of paired scheduled_shift:', shiftError1);
@@ -125,17 +124,18 @@ export async function POST(request: Request) {
       scheduledShiftIdForAssignments = newScheduledShift1.id;
 
       // Create second part of the pair (using partnerTemplate)
+      const shift2ToInsert: ScheduledShiftInsert = {
+        shift_date,
+        template_id: partnerTemplate.id,
+        start_time: partnerTemplate.start_time,
+        end_time: partnerTemplate.end_time,
+        is_recurring_generated: false,
+      };
       const { data: newScheduledShift2, error: shiftError2 } = await supabase
         .from('scheduled_shifts')
-        .insert({
-          shift_date,
-          template_id: partnerTemplate.id,
-          start_time: partnerTemplate.start_time,
-          end_time: partnerTemplate.end_time,
-          is_recurring_generated: false,
-        })
+        .insert(shift2ToInsert)
         .select('id')
-        .single();
+        .single<ScheduledShiftRow>();
       
       if (shiftError2 || !newScheduledShift2) {
         console.error('Supabase error creating second part of paired scheduled_shift:', shiftError2);
@@ -147,17 +147,18 @@ export async function POST(request: Request) {
       console.log(`Created paired shifts: ${scheduledShiftIdForAssignments} (Primary) and ${createdPartnerScheduledShiftId} (Partner)`);
 
     } else { // Not a paired shift or failed to validate partner
+      const shiftToInsert: ScheduledShiftInsert = {
+        shift_date,
+        template_id: primaryTemplate.id, // Use the fetched primary template ID
+        start_time: primaryTemplate.start_time, // Use authoritative start time
+        end_time: primaryTemplate.end_time,   // Use authoritative end time
+        is_recurring_generated: false,
+      };
       const { data: newScheduledShift, error: shiftError } = await supabase
         .from('scheduled_shifts')
-        .insert({
-          shift_date,
-          template_id: primaryTemplate.id, // Use the fetched primary template ID
-          start_time: primaryTemplate.start_time, // Use authoritative start time
-          end_time: primaryTemplate.end_time,   // Use authoritative end time
-          is_recurring_generated: false,
-        })
+        .insert(shiftToInsert)
         .select('id')
-        .single();
+        .single<ScheduledShiftRow>();
 
       if (shiftError || !newScheduledShift) {
         console.error('Supabase error creating scheduled_shift:', shiftError);
