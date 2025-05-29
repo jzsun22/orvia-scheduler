@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" })
 
 export const metadata: Metadata = {
-  title: "Shift Scheduler",
-  description: "Store shift scheduling application",
+  title: "Orvia Scheduler",
+  description: "Web based shift scheduling application",
 }
 
 export default function RootLayout({

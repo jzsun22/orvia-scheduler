@@ -3,10 +3,10 @@
 import Link from "next/link"
 // import Image from "next/image" // Image component can be added back if a logo is used
 import { usePathname } from "next/navigation"
-import { useState, useEffect } from "react" // Added useEffect
+import { useState, useEffect } from "react" 
 
 import { cn } from "@/lib/utils"
-import { supabase } from "@/lib/supabase/client" // Import Supabase client
+import { supabase } from "@/lib/supabase/client"
 import {
   LayoutDashboard,
   CalendarDays,
