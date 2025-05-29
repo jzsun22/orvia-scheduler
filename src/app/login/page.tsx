@@ -8,6 +8,7 @@ import React from 'react';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -23,6 +24,11 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
+      if (rememberMe) {
+        localStorage.setItem('rememberUser', 'true');
+      } else {
+        localStorage.removeItem('rememberUser');
+      }
       router.push('/dashboard'); // Redirect to dashboard on successful login
       router.refresh(); // Ensure the layout re-renders and middleware runs
     }
@@ -48,6 +54,18 @@ export default function LoginPage() {
           required
           style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px' } as React.CSSProperties}
         />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' } as React.CSSProperties}>
+          <input
+            type="checkbox"
+            id="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            style={{ cursor: 'pointer' } as React.CSSProperties}
+          />
+          <label htmlFor="rememberMe" style={{ cursor: 'pointer', userSelect: 'none' } as React.CSSProperties}>
+            Remember Me
+          </label>
+        </div>
         <button type="submit" style={{ padding: '10px', backgroundColor: '#0d5442', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' } as React.CSSProperties}>
           Login
         </button>
