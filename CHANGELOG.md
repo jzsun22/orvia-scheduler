@@ -14,7 +14,9 @@
 - Confirmation dialog before regenerating schedule
 - Cursor loading state during system actions
 - Dev test account setup with scaling-proof logic
-- soft delete/database cleanup script
+- Soft delete/database cleanup script
+- More dashboard content
+- Add support for additional employee personal data fields (and potential layout refactoring)
 
 
 ---
