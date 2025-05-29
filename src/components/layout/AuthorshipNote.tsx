@@ -7,7 +7,7 @@ export default function AuthorshipNote() {
         made with ♥ by jocelyn · © 2025
       </span>
       <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
-        did this just for you ♡
+        i did this just for you ♡
       </span>
     </div>
   );
