@@ -347,7 +347,8 @@ export async function fetchWorkerPositionLinksForMultipleWorkers(
 export async function fetchConflictingShiftsForMultipleWorkers(
   client: SupabaseClient,
   workerIds: string[],
-  shiftDate: string
+  shiftDate: string,
+  locationId: string
 ): Promise<Map<string, ConflictingScheduledShift[]>> {
   if (workerIds.length === 0) return new Map();
 
@@ -357,6 +358,7 @@ export async function fetchConflictingShiftsForMultipleWorkers(
       id,
       start_time,
       end_time,
+      location_id,
       shift_assignments!inner (
         id,
         worker_id, 
@@ -365,6 +367,7 @@ export async function fetchConflictingShiftsForMultipleWorkers(
       )
     `)
     .eq('shift_date', shiftDate)
+    .eq('location_id', locationId)
     .in('shift_assignments.worker_id', workerIds);
 
   if (error) {
@@ -386,10 +389,10 @@ export async function fetchConflictingShiftsForMultipleWorkers(
             id: shift.id,
             start_time: shift.start_time,
             end_time: shift.end_time,
+            location_id: shift.location_id,
             shift_assignments: [ 
               { // Store only the relevant part of the assignment
                 id: assignment.id,
-                // worker_id: assignment.worker_id, // Not needed inside this nested structure per type
                 assigned_start: assignment.assigned_start,
                 assigned_end: assignment.assigned_end,
               }

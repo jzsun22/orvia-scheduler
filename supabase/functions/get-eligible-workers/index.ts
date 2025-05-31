@@ -202,7 +202,7 @@ Deno.serve(async (req: Request) => { s
       fetchMultipleWorkerDetailsForEligibility(supabaseClient, potentialWorkerIds),
       fetchWorkerLocationLinksForMultipleWorkers(supabaseClient, potentialWorkerIds, templateData.location_id),
       fetchWorkerPositionLinksForMultipleWorkers(supabaseClient, potentialWorkerIds, templateData.position_id),
-      fetchConflictingShiftsForMultipleWorkers(supabaseClient, potentialWorkerIds, scheduledShiftData.shift_date) // Fetch conflicting shifts
+      fetchConflictingShiftsForMultipleWorkers(supabaseClient, potentialWorkerIds, scheduledShiftData.shift_date, templateData.location_id)
     ]);
     console.log('[get-eligible-workers] Bulk worker data pre-fetched.');
 

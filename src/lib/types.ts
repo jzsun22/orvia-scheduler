@@ -217,6 +217,7 @@ export interface ConflictingScheduledShift {
   id: string; // scheduled_shift_id
   start_time: string;
   end_time: string;
+  location_id: string;
   shift_assignments: { // From shift_assignments table, structure based on select query
     id: string; // shift_assignment id
     worker_id?: string; // Add worker_id here as it's used in the map keying logic

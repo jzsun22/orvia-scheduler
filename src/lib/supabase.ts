@@ -6,8 +6,10 @@ import type {
     Worker,
     ShiftTemplate,
     RecurringShiftAssignment,
-    ShiftAssignment
+    ShiftAssignment,
+    ScheduledShift
 } from './types'
+import { getWeekDateRange, formatDateToYYYYMMDD } from '@/lib/scheduling/utils'
 
 // Helper function to get the current user
 export const getCurrentUser = async (client: SupabaseClient) => {
@@ -254,5 +256,31 @@ export async function getShiftAssignmentsByScheduledShiftId(
     throw error
   }
   return data || []
+}
+
+export async function fetchWorkerShiftsForWeek(
+    client: SupabaseClient,
+    workerIds: string[],
+    weekStartDate: Date
+): Promise<ScheduledShift[]> {
+    if (workerIds.length === 0) {
+        return [];
+    }
+    const weekDates = getWeekDateRange(weekStartDate);
+    const startDateStr = formatDateToYYYYMMDD(weekDates[0]);
+    const endDateStr = formatDateToYYYYMMDD(weekDates[6]);
+
+    const { data, error } = await client
+        .from('scheduled_shifts')
+        .select('*')
+        .in('worker_id', workerIds)
+        .gte('shift_date', startDateStr)
+        .lte('shift_date', endDateStr);
+
+    if (error) {
+        console.error('Error fetching worker shifts for week:', error);
+        throw new Error(`Failed to fetch worker shifts for week: ${error.message}`);
+    }
+    return data || [];
 }
 

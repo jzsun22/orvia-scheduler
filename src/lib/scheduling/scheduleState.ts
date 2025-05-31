@@ -26,6 +26,9 @@ export class ScheduleGenerationState {
     // Format: "workerId-YYYY-MM-DD"
     private assignedWorkerDays: Set<string>; 
 
+    // Stores existing shifts for workers from OTHER locations for conflict checking
+    private existingCrossLocationShifts: ScheduledShift[];
+
     // Map to track if opening/closing leads are assigned per day
     // Format: "YYYY-MM-DD" -> { opening: boolean, closing: boolean }
     private leadSlotsFilledByDay: Map<string, { opening: boolean; closing: boolean }>;
@@ -38,14 +41,16 @@ export class ScheduleGenerationState {
      * Initializes the schedule generation state.
      * @param initialTemplates The list of all ShiftTemplate requirements for the week/location.
      * @param allWorkers The list of all potentially relevant workers to initialize the hours map.
+     * @param allWorkerShiftsForWeek OPTIONAL: Pre-fetched shifts for allWorkers across all locations for the current week.
      */
-    constructor(initialTemplates: ShiftTemplate[], allWorkers: Worker[]) {
+    constructor(initialTemplates: ShiftTemplate[], allWorkers: Worker[], allWorkerShiftsForWeek?: ScheduledShift[]) {
         this.scheduledShifts = [];
         this.shiftAssignments = [];
         this.filledTemplateSlots = new Set<string>(); // DEPRECATED
         this.filledTemplateInstances = new Map<string, Set<string>>(); // NEW
         this.assignedWorkerDays = new Set<string>(); 
         this.leadSlotsFilledByDay = new Map(); // Initialize lead tracker
+        this.existingCrossLocationShifts = allWorkerShiftsForWeek ? [...allWorkerShiftsForWeek] : []; // Store pre-fetched shifts
         
         // Store initial templates and create lookup map
         this.initialTemplates = [...initialTemplates]; // Store a copy
@@ -164,13 +169,38 @@ export class ScheduleGenerationState {
     }
 
     /**
-     * Efficiently checks if a worker already has any assignment on a specific date.
+     * Efficiently checks if a worker already has any assignment on a specific date,
+     * considering both shifts being generated for the current location AND pre-existing
+     * shifts from other locations for that week.
      */
     public isWorkerAssignedOnDate(workerId: string, date: Date): boolean {
-        // Use the imported helper
-        const dateKey = formatDateToYYYYMMDD(date); 
-        const key = `${workerId}-${dateKey}`;
-        return this.assignedWorkerDays.has(key);
+        const dateStr = formatDateToYYYYMMDD(date); 
+        
+        // Check shifts being generated for the current location
+        const keyForCurrentLocation = `${workerId}-${dateStr}`;
+        if (this.assignedWorkerDays.has(keyForCurrentLocation)) {
+            return true;
+        }
+
+        // Check pre-existing shifts from other locations
+        // Note: This checks ANY shift on that day. The `scheduled_shifts.location_id` would be different
+        // from the current generation context's locationId if it's a true cross-location conflict.
+        // The original problem was that the dashboard showed Megan at two locations. This check prevents that.
+        for (const shift of this.existingCrossLocationShifts) {
+            if (shift.worker_id === workerId && shift.shift_date === dateStr) {
+                // A shift exists for this worker on this date.
+                // We don't even need to check if shift.location_id is different,
+                // because `this.assignedWorkerDays` handles same-location conflicts.
+                // If it's in `existingCrossLocationShifts` and not for the current location,
+                // it's a conflict. If it *was* for the current location, it would have been
+                // (or should be) part of the data used to populate `assignedWorkerDays`
+                // if we were, for example, regenerating a week that already had some shifts.
+                // However, current logic in scheduleGenerator clears and rebuilds.
+                // This ensures they aren't scheduled AT ALL elsewhere on that day.
+                return true; 
+            }
+        }
+        return false;
     }
 
     /**

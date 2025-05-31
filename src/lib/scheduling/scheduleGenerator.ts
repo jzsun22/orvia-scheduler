@@ -15,7 +15,7 @@ import { assignLeads } from './leadAssigner';
 import { assignDynamicShifts } from './dynamicAssigner';
 import { saveSchedule } from './dataSaver';
 import { getWeekDateRange } from './utils'; 
-import { fetchSchedulingPrerequisites } from '@/lib/supabase'; 
+import { fetchSchedulingPrerequisites, fetchWorkerShiftsForWeek } from '@/lib/supabase'; 
 
 /**
  * Orchestrates the weekly schedule generation process for a specific location.
@@ -81,6 +81,11 @@ export async function generateWeeklySchedule(
         const activeWorkers = workersForLocation.filter(worker => worker.inactive !== true);
         console.log(`[ScheduleGenerator] From ${workersForLocation.length} location-specific workers, ${activeWorkers.length} are active.`);
 
+        // Fetch all shifts for active workers for the given week across ALL locations
+        const activeWorkerIds = activeWorkers.map(w => w.id);
+        const allWorkerShiftsForWeek = await fetchWorkerShiftsForWeek(client, activeWorkerIds, startDate);
+        console.log(`[ScheduleGenerator] Fetched ${allWorkerShiftsForWeek.length} existing shifts for active workers across all locations for the week.`);
+
         // Basic data validation
         if (!activeWorkers || activeWorkers.length === 0) {
             warnings.push(`No active workers found for location ${locationId}. Schedule generation might be incomplete.`);
@@ -95,7 +100,7 @@ export async function generateWeeklySchedule(
             // Decide if this is critical enough to stop
         }
 
-        const state = new ScheduleGenerationState(templates, activeWorkers); // Pass filtered activeWorkers
+        const state = new ScheduleGenerationState(templates, activeWorkers, allWorkerShiftsForWeek); // Pass allWorkerShiftsForWeek
         console.log("Data fetched, starting assignment phases...");
 
         // --- 2. Process Recurring Assignments ---
