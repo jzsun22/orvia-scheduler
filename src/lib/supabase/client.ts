@@ -6,12 +6,6 @@ export const supabase = createBrowserClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Add an event listener to sign out the user when the tab is closed
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', async () => {
-    // We don't want to prevent the tab from closing, so we don't return anything.
-    // We also don't want to await the signOut promise, as that might delay closing.
-    // This is a "fire and forget" operation.
-    supabase.auth.signOut();
-  });
-}
+// Removing the beforeunload event listener that was causing sign out on page refresh.
+// The user should remain logged in on page refresh.
+// Logout will occur on explicit logout button click or when the session cookie expires.

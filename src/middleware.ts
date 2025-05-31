@@ -23,11 +23,6 @@ export async function middleware(req: NextRequest) {
               value,
               ...options,
             });
-            response = NextResponse.next({
-              request: {
-                headers: req.headers,
-              },
-            });
             response.cookies.set({
               name,
               value,
@@ -39,20 +34,30 @@ export async function middleware(req: NextRequest) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  const isAuthenticated = !!user && !userError;
 
   const isAuthRoute = req.nextUrl.pathname === '/login';
 
-  if (!session && !isAuthRoute) {
+  if (!isAuthenticated && !isAuthRoute) {
     let from = req.nextUrl.pathname;
     if (req.nextUrl.search) {
       from += req.nextUrl.search;
     }
-    return NextResponse.redirect(new URL(`/login?from=${encodeURIComponent(from)}`, req.url));
+    const redirectResponse = NextResponse.redirect(new URL(`/login?from=${encodeURIComponent(from)}`, req.url));
+    response.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+    });
+    return redirectResponse;
   }
 
-  if (session && isAuthRoute) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
+  if (isAuthenticated && isAuthRoute) {
+    const redirectResponse = NextResponse.redirect(new URL('/dashboard', req.url));
+    response.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+    });
+    return redirectResponse;
   }
 
   return response;

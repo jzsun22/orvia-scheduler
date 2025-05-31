@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import React from 'react';
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,8 +34,13 @@ export default function LoginPage() {
       } else {
         localStorage.removeItem('rememberUser');
       }
-      router.push('/dashboard'); // Redirect to dashboard on successful login
-      router.refresh(); // Ensure the layout re-renders and middleware runs
+      const fromPath = searchParams.get('from');
+      if (fromPath && fromPath.startsWith('/')) {
+        router.push(fromPath);
+        router.refresh();
+      } else {
+        router.refresh();
+      }
     }
   };
 
