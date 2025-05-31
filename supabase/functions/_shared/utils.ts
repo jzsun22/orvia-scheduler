@@ -386,10 +386,10 @@ export async function updateScheduledShiftPrimaryWorker(
 }
 
 // --- Constants for Paired Prep+Barista Shifts (Cupertino) ---
-export const CUPERTINO_LOCATION_ID = process.env.CUPERTINO_LOCATION_ID;
-export const PREP_BARISTA_POSITION_ID = process.env.PREP_BARISTA_POSITION_ID;
-export const PAIRED_TEMPLATE_ID_1 = process.env.PAIRED_TEMPLATE_ID_1;
-export const PAIRED_TEMPLATE_ID_2 = process.env.PAIRED_TEMPLATE_ID_2;
+export const CUPERTINO_LOCATION_ID = Deno.env.get("CUPERTINO_LOCATION_ID");
+export const PREP_BARISTA_POSITION_ID = Deno.env.get("PREP_BARISTA_POSITION_ID");
+export const PAIRED_TEMPLATE_ID_1 = Deno.env.get("PAIRED_TEMPLATE_ID_1");
+export const PAIRED_TEMPLATE_ID_2 = Deno.env.get("PAIRED_TEMPLATE_ID_2");
 // --- End Constants ---
 
 interface ScheduledShiftForPairedCheck {

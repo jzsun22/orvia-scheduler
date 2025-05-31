@@ -3,7 +3,7 @@
 import { supabaseAdmin } from '../_shared/supabaseClient.ts'; 
 import type { SupabaseClient } from '@supabase/supabase-js'; // Still need the type if used explicitly
 
-const PREP_BARISTA_POSITION_ID = process.env.PREP_BARISTA_POSITION_ID;
+const PREP_BARISTA_POSITION_ID = Deno.env.get("PREP_BARISTA_POSITION_ID");
 
 import { 
   getShiftContext, 
@@ -52,7 +52,7 @@ interface EligibleWorkerResponse {
 declare const Deno: any;
 
 
-Deno.serve(async (req: Request) => { s
+Deno.serve(async (req: Request) => {
   console.log("[get-eligible-workers] Function start.");
   console.log("get-eligible-workers: Attempting to read SUPABASE_URL:", Deno.env.get('SUPABASE_URL') ? "Found" : "NOT FOUND OR EMPTY");
   console.log("get-eligible-workers: Attempting to read SUPABASE_SERVICE_ROLE_KEY:", Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ? "Found (length: " + (Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')?.length || 0) + ")" : "NOT FOUND OR EMPTY");

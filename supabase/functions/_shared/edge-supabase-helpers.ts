@@ -350,60 +350,71 @@ export async function fetchConflictingShiftsForMultipleWorkers(
   shiftDate: string,
   locationId: string
 ): Promise<Map<string, ConflictingScheduledShift[]>> {
-  if (workerIds.length === 0) return new Map();
+  if (workerIds.length === 0) {
+    return new Map();
+  }
 
-  const { data, error } = await client
+  const { data: shifts, error } = await client
     .from('scheduled_shifts')
     .select(`
       id,
       start_time,
       end_time,
-      location_id,
+      template_id,
+      shift_templates!inner (
+        location_id
+      ),
       shift_assignments!inner (
-        id,
-        worker_id, 
-        assigned_start, 
-        assigned_end    
+        worker_id,
+        assigned_start,
+        assigned_end
       )
     `)
     .eq('shift_date', shiftDate)
-    .eq('location_id', locationId)
+    .eq('shift_templates.location_id', locationId)
     .in('shift_assignments.worker_id', workerIds);
 
   if (error) {
-    console.error('[edge-helpers] Error fetching conflicting shifts for multiple workers:', error);
-    throw error;
+    console.error(`[edge-helpers] Error fetching conflicting shifts for multiple workers (Date: ${shiftDate}, Location: ${locationId}, Workers: ${workerIds.join(',')}). Error: ${error.message}`);
+    return new Map();
   }
 
-  const map = new Map<string, ConflictingScheduledShift[]>();
-  (data || []).forEach(shift => {
-    if (Array.isArray(shift.shift_assignments) && shift.shift_assignments.length > 0) {
-      // Ensure shift_assignments is treated as an array of the correct type.
-      const assignmentsArray = shift.shift_assignments as { id: string; worker_id: string; assigned_start: string; assigned_end: string }[];
-      assignmentsArray.forEach((assignment) => {
-        if (assignment.worker_id) {
-          if (!map.has(assignment.worker_id)) {
-            map.set(assignment.worker_id, []);
-          }
-          const conflictingShiftForWorker: ConflictingScheduledShift = {
+  const conflictingShiftsMap = new Map<string, ConflictingScheduledShift[]>();
+
+  if (!shifts || shifts.length === 0) {
+    return conflictingShiftsMap;
+  }
+
+  for (const workerId of workerIds) {
+    conflictingShiftsMap.set(workerId, []);
+  }
+  
+  for (const shift of shifts) {
+    const assignments = (shift.shift_assignments || []) as unknown as Array<{
+        worker_id: string;
+        assigned_start: string | null;
+        assigned_end: string | null;
+    }>;
+
+    for (const assignment of assignments) {
+      if (assignment.worker_id) {
+        const workerSpecificConflicts = conflictingShiftsMap.get(assignment.worker_id) || [];
+        
+        if (!workerSpecificConflicts.some(s => s.id === shift.id)) {
+          const effectiveStartTime = assignment.assigned_start || shift.start_time;
+          const effectiveEndTime = assignment.assigned_end || shift.end_time;
+
+          workerSpecificConflicts.push({
             id: shift.id,
-            start_time: shift.start_time,
-            end_time: shift.end_time,
-            location_id: shift.location_id,
-            shift_assignments: [ 
-              { // Store only the relevant part of the assignment
-                id: assignment.id,
-                assigned_start: assignment.assigned_start,
-                assigned_end: assignment.assigned_end,
-              }
-            ]
-          };
-          map.get(assignment.worker_id)!.push(conflictingShiftForWorker);
+            start_time: effectiveStartTime,
+            end_time: effectiveEndTime,
+          });
+          conflictingShiftsMap.set(assignment.worker_id, workerSpecificConflicts);
         }
-      });
+      }
     }
-  });
-  return map;
+  }
+  return conflictingShiftsMap;
 }
 
 export const fetchLocationById = async (client: SupabaseClient, locationId: string): Promise<Location | null> => {
