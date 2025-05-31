@@ -1,5 +1,25 @@
 # 🟢 Changelog — Orvia
 
+## [1.0.1] — 2025-05-30
+
+### ✅ Implemented
+- Filter employee by location
+- Confirmation dialog before regenerating schedule
+
+### 🔧 In progress
+- Informative dashboard
+    - Current date
+    - Workers on shift today
+
+### 📋 TODO
+- Cursor loading state during system actions
+- Dev test account setup with scaling-proof logic
+- Soft delete/database cleanup script
+- More dashboard content
+- Add support for additional employee personal data fields (and potential layout refactoring)
+
+---
+
 ## [1.0.0] — 2025-05-26
 
 ### ✅ Implemented
