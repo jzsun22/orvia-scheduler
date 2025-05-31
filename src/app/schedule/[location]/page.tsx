@@ -385,6 +385,17 @@ const SchedulePage = () => {
 
   const handleGenerateSchedule = async () => {
     if (!location) return;
+
+    // Check if a schedule already exists for the current week and location
+    if (scheduledShifts.length > 0) {
+      const confirmation = window.confirm(
+        "A schedule already exists for this week and location. Overwrite?"
+      );
+      if (!confirmation) {
+        return; // User cancelled the operation
+      }
+    }
+
     setIsGenerating(true);
     try {
     await generateWeeklySchedule(supabase, location.id, weekStart);
