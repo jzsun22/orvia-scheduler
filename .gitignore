@@ -25,3 +25,8 @@ supabase/.temp/
 
 # Test pages
 src/app/tests
+
+# Unit tests
+src/lib/scheduling/__tests__/
+jest.config.js
+jest.setup.js
