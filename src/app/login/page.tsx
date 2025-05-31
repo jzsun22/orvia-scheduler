@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import React from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -35,42 +39,52 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' } as React.CSSProperties}>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' } as React.CSSProperties}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px' } as React.CSSProperties}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px' } as React.CSSProperties}
-        />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' } as React.CSSProperties}>
-          <input
-            type="checkbox"
-            id="rememberMe"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-            style={{ cursor: 'pointer' } as React.CSSProperties}
-          />
-          <label htmlFor="rememberMe" style={{ cursor: 'pointer', userSelect: 'none' } as React.CSSProperties}>
-            Remember Me
-          </label>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f9f7] p-4">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-[#1f1f1f]">Login</h1>
         </div>
-        <button type="submit" style={{ padding: '10px', backgroundColor: '#0d5442', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' } as React.CSSProperties}>
-          Login
-        </button>
-        {error && <p style={{ color: 'red' } as React.CSSProperties}>{error}</p>}
-      </form>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-[#1f1f1f]">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="border-gray-300 focus:border-[#0d5442] focus:ring-[#0d5442]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-[#1f1f1f]">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="border-gray-300 focus:border-[#0d5442] focus:ring-[#0d5442]"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="rememberMe"
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+              className="border-gray-300 data-[state=checked]:bg-[#0d5442] data-[state=checked]:text-white"
+            />
+            <Label htmlFor="rememberMe" className="cursor-pointer select-none text-sm text-[#4d4d4d]">
+              Remember Me
+            </Label>
+          </div>
+          <Button type="submit" className="w-full bg-[#0d5442] text-white hover:bg-[#0a4335]">
+            Login
+          </Button>
+          {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+        </form>
+      </div>
     </div>
   );
 } 
