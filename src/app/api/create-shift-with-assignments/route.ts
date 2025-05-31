@@ -29,7 +29,7 @@ interface RequestPayload {
 }
 
 export async function POST(request: Request) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   try {
     const { shiftData, assignments }: RequestPayload = await request.json();

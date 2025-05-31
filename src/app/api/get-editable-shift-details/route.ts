@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   // The imported 'supabase' client handles its own URL and Key checks internally.
   // If NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY are missing,
   // the error would originate from there, or the client wouldn't initialize.

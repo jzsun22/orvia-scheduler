@@ -49,7 +49,7 @@ type DBAssignment = Pick<
 >;
 
 export async function POST(request: Request) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   try {
     const { scheduledShiftId, assignments: desiredAssignments }: RequestPayload = await request.json();
