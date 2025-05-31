@@ -68,7 +68,10 @@ export function SidebarNav() {
       }
       setIsLoadingLocations(false)
     }
+    fetchLocations();
+  }, [pathname]) // Keep pathname for location fetching and schedule open state
 
+  useEffect(() => {
     const fetchUserData = async () => {
       setIsLoadingUser(true)
       const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -102,10 +105,8 @@ export function SidebarNav() {
       }
       setIsLoadingUser(false)
     }
-
-    fetchLocations()
     fetchUserData()
-  }, [pathname]) // Add pathname to the dependency array
+  }, []) // Empty dependency array means this runs once on mount
 
   return (
     <div className="flex h-screen w-72 flex-col border-r border-neutral-200 bg-white p-6">
