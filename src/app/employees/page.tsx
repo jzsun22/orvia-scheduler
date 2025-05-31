@@ -3,11 +3,19 @@
 import { useState, useEffect } from 'react';
 import { fetchWorkers } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase/client'
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, ChevronDown } from 'lucide-react';
 import { AddEmployeeModal } from '@/components/modals/AddEmployeeModal';
 import { EditEmployeeModal } from '@/components/modals/EditEmployeeModal';
 import { AvailabilityModal } from '@/components/modals/AvailabilityModal';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu, 
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatWorkerName } from '@/lib/utils';
 import { JobLevel } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +60,11 @@ interface Employee {
   inactive?: boolean | null;
 }
 
+interface Location {
+  id: string;
+  name: string;
+}
+
 export default function EmployeesPage() {
   const [workers, setWorkers] = useState<DatabaseWorker[]>([]);
   const [filteredWorkers, setFilteredWorkers] = useState<DatabaseWorker[]>([]);
@@ -63,6 +76,7 @@ export default function EmployeesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isInitialDataLoaded, setIsInitialDataLoaded] = useState(false);
   
+  const [allLocations, setAllLocations] = useState<Location[]>([]);
   // Filter state hooks for future implementation
   const [jobLevelFilter, setJobLevelFilter] = useState<string[]>([]);
   const [positionFilter, setPositionFilter] = useState<string[]>([]);
@@ -83,22 +97,15 @@ export default function EmployeesPage() {
       console.log('[EmployeesPage] onAuthStateChange event:', event, 'session status:', session ? 'active' : 'inactive');
       if (session) {
         // User is signed in or session restored
-        if (event === 'INITIAL_SESSION' && !isInitialDataLoaded) {
-          console.log('[EmployeesPage] INITIAL_SESSION and initial data not loaded. Calling loadWorkers.');
-          await loadWorkers();
+        if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !isInitialDataLoaded) {
+          console.log(`[EmployeesPage] ${event} and initial data not loaded. Calling loadInitialData.`);
+          await loadInitialData();
           setIsInitialDataLoaded(true); // Mark that initial data has been loaded
-        } else if (event === 'SIGNED_IN') {
-          if (!isInitialDataLoaded) {
-            // This case handles if SIGNED_IN is the first event with a session (e.g. after manual login)
-            console.log('[EmployeesPage] SIGNED_IN and initial data not loaded. Calling loadWorkers.');
-            await loadWorkers();
-            setIsInitialDataLoaded(true);
-          } else {
+        } else if (event === 'SIGNED_IN' && isInitialDataLoaded) {
             console.log('[EmployeesPage] SIGNED_IN event, but initial data already loaded. Currently NOT reloading workers to prevent potential infinite loop on tab refocus.');
             // To prevent the loop, we are not calling loadWorkers() here on subsequent SIGNED_IN events (e.g., tab refocus).
             // If data refresh on tab focus is strictly required and this SIGNED_IN event is the correct trigger,
             // then the robustness of loadWorkers() on such calls would need further investigation.
-          }
         } else if (event === 'TOKEN_REFRESHED') {
             console.log('[EmployeesPage] TOKEN_REFRESHED. Data not automatically reloaded, but consider if needed.');
             // If data needs to be refreshed when token is updated, you might call loadWorkers() here:
@@ -159,15 +166,53 @@ export default function EmployeesPage() {
     console.log('[EmployeesPage] Filtered workers result:', result);
   }, [workers, searchQuery, jobLevelFilter, positionFilter, locationFilter]);
 
-  const loadWorkers = async () => {
+  const loadInitialData = async () => {
     setLoading(true);
     setError(null);
-    console.log('[EmployeesPage] loadWorkers: Starting to fetch workers...');
+    console.log('[EmployeesPage] loadInitialData: Starting to fetch initial data...');
+    try {
+      // Fetch workers
+      const fetchedWorkers = await fetchWorkers(supabase);
+      console.log('[EmployeesPage] loadInitialData: Raw data from fetchWorkers:', fetchedWorkers);
+      setWorkers(fetchedWorkers);
+      setFilteredWorkers(fetchedWorkers); // Initialize filteredWorkers with all workers
+      console.log('[EmployeesPage] loadInitialData: Set workers and filteredWorkers state. Workers:', fetchedWorkers);
+
+      // Fetch locations
+      const { data: locationsData, error: locationsError } = await supabase
+        .from('locations')
+        .select('id, name');
+      
+      if (locationsError) {
+        console.error('Error fetching locations:', locationsError);
+        throw new Error(locationsError.message);
+      }
+      console.log('[EmployeesPage] loadInitialData: Raw data from locations fetch:', locationsData);
+      setAllLocations(locationsData || []);
+
+      setLoading(false);
+    } catch (err: any) {
+      console.error('Error fetching initial data:', err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  const loadWorkers = async () => {
+    // This function can be kept if you need to reload only workers later,
+    // or can be merged into loadInitialData if workers and locations are always loaded together.
+    // For now, let's assume loadInitialData is the primary way to load data.
+    // If loadWorkers is still called from somewhere else (e.g. after adding/editing an employee),
+    // ensure it behaves as expected. Consider if it should also reload locations or if that's not needed.
+    // For simplicity, this example will have modals call loadInitialData to refresh everything.
+    setLoading(true);
+    setError(null);
+    console.log('[EmployeesPage] loadWorkers: Starting to fetch workers (potentially redundant if loadInitialData is used everywhere)...');
     try {
       const fetchedData = await fetchWorkers(supabase);
       console.log('[EmployeesPage] loadWorkers: Raw data from fetchWorkers:', fetchedData);
       setWorkers(fetchedData);
-      setFilteredWorkers(fetchedData); // Initialize filteredWorkers with all workers
+      setFilteredWorkers(fetchedData);
       console.log('[EmployeesPage] loadWorkers: Set workers and filteredWorkers state. Workers:', fetchedData);
       setLoading(false);
     } catch (err: any) {
@@ -198,6 +243,14 @@ export default function EmployeesPage() {
 
   const handleAvailabilityClick = (worker: DatabaseWorker) => {
     setEditingAvailability(worker);
+  };
+
+  const handleLocationFilterChange = (locationId: string) => {
+    setLocationFilter(prev => 
+      prev.includes(locationId) 
+        ? prev.filter(id => id !== locationId) 
+        : [...prev, locationId]
+    );
   };
 
   if (loading) {
@@ -234,35 +287,65 @@ export default function EmployeesPage() {
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="mb-6 flex flex-col gap-4">
+        <div className="mb-6 flex flex-wrap gap-4 items-center">
           {/* Search Bar */}
-          <div className="relative">
+          <div className="relative w-full md:w-96">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search employees by name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full md:w-1/3"
+              className="pl-10 w-full"
             />
           </div>
           
-          {/* Filter Controls - Hook for future implementation */}
-          <div className="flex flex-wrap gap-4">
-            {/* Job Level Filter - Placeholder */}
-            <div className="hidden">
-              {/* Job level filter will be implemented in future iterations */}
-            </div>
-            
-            {/* Position Filter - Placeholder */}
-            <div className="hidden">
-              {/* Position filter will be implemented in future iterations */}
-            </div>
-            
-            {/* Location Filter - Placeholder */}
-            <div className="hidden">
-              {/* Location filter will be implemented in future iterations */}
-            </div>
+          {/* Location Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex items-center justify-between whitespace-nowrap rounded-md border-input bg-background px-3 h-10 w-auto min-w-[200px] text-sm" // Adjusted min-width
+              >
+                <div className="flex items-center">
+                  <span className="text-muted-foreground mr-1">Location:</span>
+                  <span>
+                    {locationFilter.length === 0
+                      ? 'All'
+                      : locationFilter.length === 1
+                      ? allLocations.find(loc => loc.id === locationFilter[0])?.name || `${locationFilter.length} selected`
+                      : `${locationFilter.length} selected`}
+                  </span>
+                </div>
+                <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Locations</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {allLocations.map((location) => (
+                <DropdownMenuCheckboxItem
+                  key={location.id}
+                  checked={locationFilter.includes(location.id)}
+                  onCheckedChange={() => handleLocationFilterChange(location.id)}
+                >
+                  {location.name}
+                </DropdownMenuCheckboxItem>
+              ))}
+              {allLocations.length === 0 && (
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">No locations found</DropdownMenuLabel>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Job Level Filter - Placeholder */}
+          <div className="hidden">
+            {/* Job level filter will be implemented in future iterations */}
+          </div>
+          
+          {/* Position Filter - Placeholder */}
+          <div className="hidden">
+            {/* Position filter will be implemented in future iterations */}
           </div>
         </div>
 
@@ -331,7 +414,7 @@ export default function EmployeesPage() {
         onClose={() => setShowAddModal(false)}
           onSuccess={() => {
             setShowAddModal(false);
-            loadWorkers();
+            loadInitialData(); // Use loadInitialData to refresh all data
           }}
       />
       )}
@@ -343,7 +426,7 @@ export default function EmployeesPage() {
           onClose={() => setEditingEmployee(null)}
           onSuccess={() => {
             setEditingEmployee(null);
-            loadWorkers();
+            loadInitialData(); // Use loadInitialData
           }}
         />
       )}
@@ -355,7 +438,7 @@ export default function EmployeesPage() {
           onClose={() => setEditingAvailability(null)}
           onSuccess={() => {
             setEditingAvailability(null);
-            loadWorkers();
+            loadInitialData(); // Use loadInitialData
           }}
         />
       )}
