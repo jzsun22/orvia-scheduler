@@ -5,6 +5,8 @@
 ### ✅ Implemented
 - Filter employee by location
 - Confirmation dialog before regenerating schedule
+- fix authentication issue on page refresh and on tab close
+- *critical bug fix*: workers assignment cross-location check in scheduling logic
 
 ### 🔧 In progress
 - Informative dashboard
@@ -15,7 +17,6 @@
 - Cursor loading state during system actions
 - Dev test account setup with scaling-proof logic
 - Soft delete/database cleanup script
-- More dashboard content
 - Add support for additional employee personal data fields (and potential layout refactoring)
 
 ---
